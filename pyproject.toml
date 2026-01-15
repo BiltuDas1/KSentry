@@ -18,5 +18,6 @@ package-mode = false
 
 [dependency-groups]
 dev = [
-    "ruff (>=0.14.11,<0.15.0)"
+    "ruff (>=0.14.11,<0.15.0)",
+    "python-dotenv (>=1.2.1,<2.0.0)"
 ]

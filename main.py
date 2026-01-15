@@ -1,8 +1,14 @@
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
+from core import settings
 
 
-app = FastAPI()
+app = FastAPI(
+  title="KSentry",
+  docs_url=settings.DOCS_URL,
+  redoc_url=settings.REDOC_URL,
+  openapi_url=settings.OPENAPI_URL,
+)
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -25,4 +31,4 @@ def root():
 if __name__ == "__main__":
   import uvicorn
 
-  uvicorn.run("main:app", host="0.0.0.0", port=5001, reload=True)
+  uvicorn.run("main:app", host="0.0.0.0", port=5001, reload=not settings.PRODUCTION)

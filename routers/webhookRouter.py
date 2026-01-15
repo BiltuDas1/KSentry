@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from services import pull_request
+from services import is_updated
 from fastapi.requests import Request
 
 
@@ -10,6 +10,6 @@ def Webhook(app: FastAPI):
     action = payload.get("action")
 
     if action == "opened":
-      await pull_request.pull_request(payload)
+      await is_updated.check_if_updated(payload)
 
     return True

@@ -38,7 +38,7 @@ async def check_if_updated(payload: dict):
   response = await settings.HTTPX.get(
     f"https://api.github.com/repos/{repo}/compare/{default_branch}...{label}"
   )
-  if response.status_code != 201:
+  if response.status_code != 200:
     return
   data = response.json()
   behind_by = data.get("behind_by")

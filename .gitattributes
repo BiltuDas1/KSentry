@@ -1,0 +1,4 @@
+# Convert all source files to use LF
+*.py text eol=lf
+*.toml text eol=lf
+*.lock text eol=lf

@@ -4,3 +4,9 @@ KSentry is a lightweight, serverless security and workflow orchestrator. It acts
 
 1. Zero-Trust Secret Scanning: Uses Gitleaks to identify and redact leaked credentials before they merge.
 2. Round Robin Reviewer Logic: Fairly distributes workload by rotating assignments among established contributors, ensuring no single developer becomes a bottleneck.
+
+## Deploy
+
+### Deploy in Vercel
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/BiltuDas1/KSentry&template=fastapi)

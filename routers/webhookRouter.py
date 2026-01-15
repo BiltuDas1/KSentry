@@ -4,7 +4,7 @@ from fastapi.requests import Request
 
 
 def Webhook(app: FastAPI):
-  @app.get("/webhook")
+  @app.post("/webhook")
   async def hook(request: Request):
     result = await request.json()
     event = result.get("event")

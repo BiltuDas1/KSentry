@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from fastapi.responses import HTMLResponse
+from routers.webhookRouter import Webhook
 from core import settings
 
 
@@ -10,22 +10,7 @@ app = FastAPI(
   openapi_url=settings.OPENAPI_URL,
 )
 
-
-@app.get("/", response_class=HTMLResponse)
-def root():
-  return """
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>FastAPI</title>
-    </head>
-    <body>
-      <p>Hello, World!</p>
-    </body>
-    </html>
-    """
+Webhook(app)
 
 
 if __name__ == "__main__":

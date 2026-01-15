@@ -4,14 +4,12 @@ from fastapi.requests import Request
 
 
 def Webhook(app: FastAPI):
-  @app.post("/webhook")
+  @app.post("/")
   async def hook(request: Request):
-    result = await request.json()
-    event = result.get("event")
-    payload = result.get("payload")
+    payload = await request.json()
     action = payload.get("action")
 
-    if event == "pull_request" and action == "opened":
+    if action == "opened":
       await pull_request.pull_request(payload)
-    
+
     return True

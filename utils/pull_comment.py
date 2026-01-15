@@ -1,19 +1,21 @@
-import httpx
+from . import jwt
+from core import settings
 
 
-def post_comment(installation_token: int, repo: str, pull_number: int, message: str):
+async def post_comment(installation_id: int, repo: str, pull_number: int, message: str):
   """Posts a comment to the specified Pull Request."""
   url = f"https://api.github.com/repos/{repo}/issues/{pull_number}/comments"
 
+  token = await jwt.get_installation_token(installation_id)
+
   headers = {
-    "Authorization": f"Bearer {installation_token}",
+    "Authorization": f"Bearer {token}",
     "Accept": "application/vnd.github+json",
-    "X-GitHub-Api-Version": "2022-11-28",
   }
 
   data = {"body": message}
 
-  response = httpx.post(url, headers=headers, json=data)
+  response = await settings.HTTPX.post(url, headers=headers, json=data)
 
   if response.status_code != 201:
     print(f"Failed to post comment: {response.status_code} - {response.text}")

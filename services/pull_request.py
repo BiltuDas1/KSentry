@@ -1,4 +1,5 @@
-from utils import comment
+from utils import pull_comment
+
 
 async def pull_request(payload: dict):
   installation = payload.get("installation")
@@ -10,8 +11,10 @@ async def pull_request(payload: dict):
   repository = payload.get("repository")
   if repository is None:
     return
-  repo = repository.get("fullname")
+  repo = repository.get("full_name")
   pull_number = payload.get("number")
   if pull_number is None:
     return
-  comment.post_comment(token, repo, pull_number, "Thank you for creating this **Pull Request**!")
+  await pull_comment.post_comment(
+    token, repo, pull_number, "Thank you for creating this **Pull Request**!"
+  )

@@ -2,6 +2,7 @@ from . import debug, environ
 import httpx
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
+import redis.asyncio as redis
 
 
 PRODUCTION = not debug.DEBUG
@@ -22,8 +23,16 @@ APP_ID = str(environ.ENV.get("APP_ID"))
 
 HTTPX = httpx.AsyncClient()
 
+# Redis Connection
+if not environ.ENV.exist("REDIS_URL"):
+  raise EnvironmentError("REDIS_URL Environment can't be empty")
+REDIS = redis.from_url(
+  str(environ.ENV.get("REDIS_URL")), encoding="utf-8", decode_responses=True
+)
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
   yield
   await HTTPX.aclose()
+  await REDIS.aclose()

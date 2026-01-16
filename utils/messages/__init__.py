@@ -1,0 +1,27 @@
+from . import messages
+
+
+def get_outdated_upstream(upstream_branch_name: str, upstream_repo: str):
+  """
+  Get the message body of the Pull Request comment when the branch is not uptodate with the upstream branch
+
+  :param upstream_branch_name: Name of the upstream branch, branch name only
+  :type upstream_branch_name: str
+  :param upstream_repo: The repo name of the origin, Should be in this format username/reponame
+  :type upstream_repo: str
+  """
+  return messages.PULL_OUTDATED_UPSTREAM.format(
+    upstream_branch_name=upstream_branch_name, upstream_repo=upstream_repo
+  )
+
+
+def get_outdated_upstream_again(upstream_branch_name: str):
+  """
+  Get the message body of the Outdated Pull Request Comment, when the user created new commits but still it's not uptodate with origin
+
+  :param upstream_branch_name: Name of the upstream branch, branch name only
+  :type upstream_branch_name: str
+  """
+  return messages.PULL_OUTDATED_UPSTREAM_AGAIN.format(
+    upstream_branch_name=upstream_branch_name
+  )

@@ -1,38 +1,52 @@
 from core import settings
-from utils import pull_comment
+from utils import jwt, pr_label, pull_comment, messages
+from models import PullRequesPayload, CompareBranch
 
 
-async def check_if_updated(payload: dict):
+async def check_if_updated(payload: PullRequesPayload):
   """
   Checks if the Requested branch is up-to-date with the main branch.
   If not then send a comment to update the branch
   """
-  installation = payload.get("installation")
-  if installation is None:
+  installation_id = payload.installation.id
+  repo = payload.repository.full_name
+  default_branch = payload.repository.default_branch
+  pull_number = payload.number
+  label = payload.pull_request.head.label
+
+  response = await settings.HTTPX.get(
+    f"https://api.github.com/repos/{repo}/compare/{default_branch}...{label}"
+  )
+  if response.status_code != 200:
     return
-  token = installation.get("id")
-  if token is None:
-    return
-  repository = payload.get("repository")
-  if repository is None:
-    return
-  repo = repository.get("full_name")
-  if repo is None:
-    return
-  default_branch = repository.get("default_branch")
-  if default_branch is None:
-    return
-  pull_number = payload.get("number")
-  if pull_number is None:
-    return
-  pull_request = payload.get("pull_request")
-  if pull_request is None:
-    return
-  head = pull_request.get("head")
-  if head is None:
-    return
-  label = head.get("label")
-  if label is None:
+
+  data = CompareBranch.model_validate(response.json())
+  if data.behind_by > 0:
+    token: str = await jwt.get_installation_token(installation_id)
+
+    await settings.REDIS.sadd("conflicted_pull_request", pull_number)  # type: ignore
+    await pr_label.create_label(
+      token, repo, "outdated", "cfd3d7", "The Pull Request is outdated"
+    )
+    await pr_label.add_label_to_pr(token, repo, pull_number, "outdated")
+    await pull_comment.post_comment(
+      token, repo, pull_number, messages.get_outdated_upstream(default_branch, repo)
+    )
+
+
+async def updated_again(payload: PullRequesPayload):
+  """
+  Re-check if the branch is merge properly or not, if not then send message to merge again,
+  if merge successful then remove outdated label from pr
+  """
+  installation_id = payload.installation.id
+  repo = payload.repository.full_name
+  default_branch = payload.repository.default_branch
+  label = payload.pull_request.head.label
+  pull_number = payload.number
+
+  exist = await settings.REDIS.sismember("conflicted_pull_request", pull_number)  # type: ignore
+  if not exist:
     return
 
   response = await settings.HTTPX.get(
@@ -40,14 +54,13 @@ async def check_if_updated(payload: dict):
   )
   if response.status_code != 200:
     return
-  data = response.json()
-  behind_by = data.get("behind_by")
-  if behind_by is None:
-    return
-  if behind_by > 0:
+
+  data = CompareBranch.model_validate(response.json())
+  token: str = await jwt.get_installation_token(installation_id)
+  if data.behind_by > 0:
     await pull_comment.post_comment(
-      token,
-      repo,
-      pull_number,
-      f"Your branch is not up-to-date with `{default_branch}` branch. You should update it.",
+      token, repo, pull_number, messages.get_outdated_upstream_again(default_branch)
     )
+  else:
+    await settings.REDIS.srem("conflicted_pull_request", pull_number)  # type: ignore
+    await pr_label.remove_label_from_pr(token, repo, pull_number, "outdated")

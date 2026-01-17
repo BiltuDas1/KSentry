@@ -20,6 +20,11 @@ if not environ.ENV.exist("APP_ID"):
   raise EnvironmentError("APP_ID Environment can't be empty")
 APP_ID = str(environ.ENV.get("APP_ID"))
 
+# Load APP_SECRET
+if not environ.ENV.exist("APP_SECRET"):
+  raise EnvironmentError("APP_SECRET Environment can't be empty")
+APP_SECRET = str(environ.ENV.get("APP_SECRET"))
+
 
 HTTPX = httpx.AsyncClient()
 

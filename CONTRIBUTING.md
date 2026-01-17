@@ -47,8 +47,9 @@ To get a local copy of the project up and running on your machine, follow these 
 3. Fill all the required details
 4. Mark the Webhook as Active
 5. Set the Webhook URL as the Smee Webhook Proxy URL
-6. Select `Where can this GitHub App be installed?` to `Only on this Account`
-7. Press Create Github App
+6. Input a password in the secret field
+7. Select `Where can this GitHub App be installed?` to `Only on this Account`
+8. Press Create Github App
 
 #### Setup Environments
 
@@ -56,8 +57,9 @@ To get a local copy of the project up and running on your machine, follow these 
 2. Select your app in https://github.com/settings/apps and press `edit`
 3. Scroll down and then press `Generate Private Key`, and save the private key to your computer
 4. Open the Private Key in a text editor and then copy the whole contents and set it in `.env` `APP_PRIVATE_KEY`
-5. Copy the `APP_ID` from the same page and fill it in `.env`
-6. Setup Redis Database and Set the connection URI to `REDIS_URL`
+5. Write down the Webhook secret to the `APP_SECRET`
+6. Copy the `APP_ID` from the same page and fill it in `.env`
+7. Setup Redis Database and Set the connection URI to `REDIS_URL`
 
 ### Run the Project
 

@@ -4,6 +4,7 @@ from fastapi.requests import Request
 from models import PullRequesPayload
 from utils import verify_signature
 import json
+from core import settings
 
 
 def Webhook(app: FastAPI):
@@ -12,7 +13,7 @@ def Webhook(app: FastAPI):
     data = await request.body()
     sigHeader = str(request.headers.get("x-hub-signature-256"))
 
-    if not verify_signature.verify_signature(data, sigHeader, "hello-world"):
+    if not verify_signature.verify_signature(data, sigHeader, settings.APP_SECRET):
       return False
 
     event = str(request.headers.get("x-github-event"))

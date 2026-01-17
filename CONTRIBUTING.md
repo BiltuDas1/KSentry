@@ -81,6 +81,11 @@ To get a local copy of the project up and running on your machine, follow these 
 
 To keep the project history clean and manageable, please follow these steps when contributing:
 
+### Fork the repository
+
+- Click on the Fork button to fork it in your account
+- Clone the repository using SSH in your computer
+
 ### Create a branch
 
 Always create a new branch for your work. Avoid committing directly to `main`.

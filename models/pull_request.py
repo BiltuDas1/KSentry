@@ -7,7 +7,7 @@ class Installation(BaseModel):
 
 
 class Sender(BaseModel):
-  pass
+  type: str
 
 
 class PullRequestHead(BaseModel):

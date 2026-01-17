@@ -1,5 +1,5 @@
 from core import settings
-from utils import jwt, pr_label, pull_comment, messages
+from utils import branch, jwt, pr_label, pull_comment, messages
 from models import PullRequesPayload, CompareBranch
 
 
@@ -14,16 +14,14 @@ async def check_if_updated(payload: PullRequesPayload):
   pull_number = payload.number
   label = payload.pull_request.head.label
 
-  response = await settings.HTTPX.get(
-    f"https://api.github.com/repos/{repo}/compare/{default_branch}...{label}"
-  )
-  if response.status_code != 200:
+  token: str = await jwt.get_installation_token(installation_id)
+  if (
+    response := await branch.compare_branch(token, repo, default_branch, label)
+  ) is None:
     return
 
   data = CompareBranch.model_validate(response.json())
   if data.behind_by > 0:
-    token: str = await jwt.get_installation_token(installation_id)
-
     await settings.REDIS.sadd("conflicted_pull_request", pull_number)  # type: ignore
     await pr_label.create_label(
       token, repo, "outdated", "cfd3d7", "The Pull Request is outdated"
@@ -49,14 +47,13 @@ async def updated_again(payload: PullRequesPayload):
   if not exist:
     return
 
-  response = await settings.HTTPX.get(
-    f"https://api.github.com/repos/{repo}/compare/{default_branch}...{label}"
-  )
-  if response.status_code != 200:
+  token: str = await jwt.get_installation_token(installation_id)
+  if (
+    response := await branch.compare_branch(token, repo, default_branch, label)
+  ) is None:
     return
 
   data = CompareBranch.model_validate(response.json())
-  token: str = await jwt.get_installation_token(installation_id)
   if data.behind_by > 0:
     await pull_comment.post_comment(
       token, repo, pull_number, messages.get_outdated_upstream_again(default_branch)

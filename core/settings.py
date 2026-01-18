@@ -46,6 +46,7 @@ REDIS = redis.from_url(
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+  await scanning.scan_code()
   yield
   await HTTPX.aclose()
   await REDIS.aclose()

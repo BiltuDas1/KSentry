@@ -53,6 +53,6 @@ async def request_scan(payload: PullRequesPayload):
   await settings.REDIS.rpush("queue", data.toBase64())  # type:ignore
 
   try:
-    await settings.HTTPX.get(f"{settings.WORKER_URL}/process", timeout=2)
+    await settings.HTTPX.get(f"{settings.WORKER_URL}/process")
   except Exception as e:
     print(e)

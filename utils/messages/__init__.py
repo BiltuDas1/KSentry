@@ -37,6 +37,7 @@ def get_secret_found(secrets_data: list[GitLeaks]):
   for leak in secrets_data:
     data.append(
       messages.SECRET_CODEBLOCK.format(
+        filename=leak.File,
         line_num=leak.StartLine,
         redact_code=redact.replace_redact(
           redact.redact_text(leak.Secret), leak.Secret, leak.Match

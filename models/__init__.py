@@ -36,6 +36,7 @@ class ScanData(BaseModel):
 
 
 class GitLeaks(BaseModel):
+  File: str
   StartLine: int
   EndLine: int
   StartColumn: int

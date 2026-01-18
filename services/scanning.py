@@ -32,6 +32,10 @@ async def scan_code():
 
     result = await scan.gitleaks(resp.content)
 
+    # If no secret found leave
+    if len(result) == 0:
+      return
+
     await comment.post_comment(
       token, pr_data.repo, pr_data.pr_number, messages.get_secret_found(result)
     )

@@ -50,6 +50,8 @@ SECRET_FOUND = """
 """
 
 SECRET_CODEBLOCK = """
+---
+**{filename}:**
 ```
 {line_num} | {redact_code}
 ```

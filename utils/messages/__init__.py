@@ -1,4 +1,6 @@
 from . import messages
+from models import GitLeaks
+from utils import redact
 
 
 def get_outdated_upstream(upstream_branch_name: str, upstream_repo: str):
@@ -25,3 +27,21 @@ def get_outdated_upstream_again(upstream_branch_name: str):
   return messages.PULL_OUTDATED_UPSTREAM_AGAIN.format(
     upstream_branch_name=upstream_branch_name
   )
+
+
+def get_secret_found(secrets_data: list[GitLeaks]):
+  """
+  Get the message body of the Secret Found Comment
+  """
+  data = []
+  for leak in secrets_data:
+    data.append(
+      messages.SECRET_CODEBLOCK.format(
+        line_num=leak.StartLine,
+        redact_code=redact.replace_redact(
+          redact.redact_text(leak.Secret), leak.Secret, leak.Match
+        ),
+      )
+    )
+
+  return messages.SECRET_FOUND.format(secrets_data="\n".join(data))

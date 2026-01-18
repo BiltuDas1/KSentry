@@ -42,3 +42,15 @@ Do the following steps to update your branch:
 PULL_OUTDATED_UPSTREAM_AGAIN = (
   "Still not updated with `origin/{upstream_branch_name}`, Please try again"
 )
+
+SECRET_FOUND = """
+### Warning: Secrets found in this PR ⚠️
+
+{secrets_data}
+"""
+
+SECRET_CODEBLOCK = """
+```
+{line_num} | {redact_code}
+```
+"""

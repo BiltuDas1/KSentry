@@ -1,0 +1,12 @@
+[extend]
+useDefault = true
+
+[[rules]]
+id = "universal-entropy-assignment"
+description = "Detects any high-entropy string assigned to ANY variable"
+
+# Matches: [any_word] followed by [= or :] followed by [any string in quotes]
+# We use (.{20,150}) to capture everything including special symbols and internal quotes
+regex = '''(?i)[a-z0-9_]+\s*[=:]\s*['"](?P<secret>.{20,150})['"]'''
+
+entropy = 3.5

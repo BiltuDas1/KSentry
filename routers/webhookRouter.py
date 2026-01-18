@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from services import is_updated, closed_pull
+from services import is_updated, closed_pull, scanning
 from fastapi.requests import Request
 from models import PullRequesPayload
 from utils import verify_signature
@@ -23,11 +23,13 @@ def Webhook(app: FastAPI):
     if payload.sender.type == "Bot":
       return False
 
-    if event == "pull_request" and payload.action == "opened":
-      await is_updated.check_if_updated(payload)
-    elif event == "pull_request" and payload.action == "synchronize":
-      await is_updated.updated_again(payload)
-    elif event == "pull_request" and payload.action == "closed":
-      await closed_pull.pull_request_closed(payload)
-
+    if event == "pull_request":
+      match payload.action:
+        case "opened":
+          if await is_updated.check_if_updated(payload):
+            await scanning.request_scan(payload)
+        case "synchronize":
+          await is_updated.updated_again(payload)
+        case "closed":
+          await closed_pull.pull_request_closed(payload)
     return True

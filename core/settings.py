@@ -3,6 +3,7 @@ import httpx
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 import redis.asyncio as redis
+from services import scanning
 
 
 PRODUCTION = not debug.DEBUG
@@ -26,7 +27,14 @@ if not environ.ENV.exist("APP_SECRET"):
 APP_SECRET = str(environ.ENV.get("APP_SECRET"))
 
 
+SERVERLESS = debug.SERVERLESS
 HTTPX = httpx.AsyncClient()
+
+# WORKER_URL
+if SERVERLESS:
+  if not environ.ENV.exist("WORKER_URL"):
+    raise EnvironmentError("WORKER_URL Environment can't be empty")
+  WORKER_URL = str(environ.ENV.get("WORKER_URL"))
 
 # Redis Connection
 if not environ.ENV.exist("REDIS_URL"):

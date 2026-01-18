@@ -209,5 +209,20 @@ __marimo__/
 # Private Key
 *.pem
 
-# Docker
+# Docker files
+.dockerignore
+Dockerfile
 docker-compose.yml
+
+# Git Folder
+.git
+.git*
+
+# Other files
+.vercelignore
+CONTRIBUTING.md
+vercel.json
+ruff.toml
+.env.example
+pyproject.toml
+poetry.lock

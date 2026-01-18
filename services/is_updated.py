@@ -1,5 +1,5 @@
 from core import settings
-from utils import branch, jwt, pr_label, pull_comment, messages
+from utils import branch, comment, jwt, pr_label, messages
 from models import PullRequesPayload, CompareBranch
 
 
@@ -18,7 +18,7 @@ async def check_if_updated(payload: PullRequesPayload):
   if (
     response := await branch.compare_branch(token, repo, default_branch, label)
   ) is None:
-    return
+    return False
 
   data = CompareBranch.model_validate(response.json())
   if data.behind_by > 0:
@@ -27,9 +27,11 @@ async def check_if_updated(payload: PullRequesPayload):
       token, repo, "outdated", "cfd3d7", "The Pull Request is outdated"
     )
     await pr_label.add_label_to_pr(token, repo, pull_number, "outdated")
-    await pull_comment.post_comment(
+    await comment.post_comment(
       token, repo, pull_number, messages.get_outdated_upstream(default_branch, repo)
     )
+    return False
+  return True
 
 
 async def updated_again(payload: PullRequesPayload):
@@ -55,7 +57,7 @@ async def updated_again(payload: PullRequesPayload):
 
   data = CompareBranch.model_validate(response.json())
   if data.behind_by > 0:
-    await pull_comment.post_comment(
+    await comment.post_comment(
       token, repo, pull_number, messages.get_outdated_upstream_again(default_branch)
     )
   else:

@@ -6,7 +6,9 @@ from pydantic import ValidationError
 from models import GitLeaks
 
 
-async def gitleaks(raw_data: bytes) -> List[GitLeaks]:
+async def gitleaks(
+  raw_data: bytes, config_path: str = "gitleaks.toml"
+) -> List[GitLeaks]:
   """
   Parses a unified diff, scans each hunk, and calculates
   absolute line numbers for GitHub reporting.
@@ -57,7 +59,7 @@ async def gitleaks(raw_data: bytes) -> List[GitLeaks]:
         "detect",
         "--pipe",
         "--config",
-        "gitleaks.toml",
+        config_path,
         "--report-format",
         "json",
         "--report-path",

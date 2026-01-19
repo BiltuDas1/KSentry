@@ -1,6 +1,32 @@
 from core import settings
 from models import ScanData, PullRequesPayload
 from utils import jwt, scan, comment, messages
+import tempfile
+import os
+
+
+async def fetch_remote_config(token: str, repo: str, default_branch: str) -> str | None:
+  """
+  Fetches gitleaks.toml from the repository's default branch.
+  """
+  headers = {
+    "Authorization": f"Bearer {token}",
+    "Accept": "application/vnd.github.raw",
+  }
+
+  # Fetch gitleaks.toml from the root of the repo
+  url = (
+    f"https://api.github.com/repos/{repo}/contents/gitleaks.toml?ref={default_branch}"
+  )
+
+  try:
+    response = await settings.HTTPX.get(url, headers=headers)
+    if response.status_code == 200:
+      return response.text
+  except Exception as e:
+    print(f"Error fetching remote config: {e}")
+
+  return None
 
 
 async def check_pr():
@@ -30,7 +56,24 @@ async def scan_code():
     if resp.status_code != 200:
       continue
 
-    result = await scan.gitleaks(resp.content)
+    config_path = "gitleaks.toml"
+    temp_config = None
+    remote_config_content = await fetch_remote_config(
+      token, pr_data.repo, pr_data.default_branch
+    )
+
+    if remote_config_content:
+      temp_config = tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".toml")
+      temp_config.write(remote_config_content)
+      temp_config.close()  # Close it so gitleaks subprocess can read it
+      config_path = temp_config.name
+      print(f"Using remote config for {pr_data.repo}")
+
+    try:
+      result = await scan.gitleaks(resp.content, config_path)
+    finally:
+      if temp_config:
+        os.remove(temp_config.name)
 
     # If no secret found leave
     if len(result) == 0:

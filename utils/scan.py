@@ -4,6 +4,39 @@ import asyncio
 from typing import List
 from pydantic import ValidationError
 from models import GitLeaks
+import tomllib
+from typing import List, Pattern
+
+
+def parse_allowlist(config_path: str) -> List[Pattern]:
+  """
+  Parses gitleaks.toml using the standard library's tomllib.
+  Returns a list of compiled regex patterns to ignore.
+  """
+  allowlist_patterns = []
+  try:
+    with open(config_path, "rb") as f:
+      data = tomllib.load(f)
+
+    allowlist = data.get("allowlist", {})
+
+    if isinstance(allowlist, list):
+      allowlist = allowlist[0] if allowlist else {}
+
+    raw_paths = allowlist.get("paths", [])
+
+    for p in raw_paths:
+      try:
+        allowlist_patterns.append(re.compile(p))
+      except re.error:
+        print(f"Invalid regex in allowlist: {p}")
+
+  except FileNotFoundError:
+    print(f"Config file not found: {config_path}")
+  except tomllib.TOMLDecodeError as e:
+    print(f"Error parsing TOML: {e}")
+
+  return allowlist_patterns
 
 
 async def gitleaks(
@@ -20,6 +53,7 @@ async def gitleaks(
   # We split by 'diff --git ' but keep the delimiter
   file_chunks = re.split(r"(?=diff --git )", diff_text)
 
+  ignored_patterns = parse_allowlist(config_path)
   final_results = []
 
   for file_chunk in file_chunks:
@@ -29,6 +63,9 @@ async def gitleaks(
     # Extract Filename (b/path/to/file)
     filename_match = re.search(r" b/(.*)", file_chunk.splitlines()[0])
     filename = filename_match.group(1) if filename_match else "unknown"
+
+    if any(pattern.search(filename) for pattern in ignored_patterns):
+      continue
 
     # Split the File Block into individual Hunks (@@ blocks)
     # This ensures line math is accurate for PRs with changes in different parts of a file.

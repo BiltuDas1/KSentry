@@ -67,7 +67,7 @@ async def scan_code():
       temp_config.write(remote_config_content)
       temp_config.close()  # Close it so gitleaks subprocess can read it
       config_path = temp_config.name
-      print(f"Using remote config for {pr_data.repo}")
+      print(f"Using remote config for {pr_data.repo}", flush=True)
 
     try:
       result = await scan.gitleaks(resp.content, config_path)

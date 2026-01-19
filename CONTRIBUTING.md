@@ -9,9 +9,11 @@ To get a local copy of the project up and running on your machine, follow these 
 ### Prerequisites
 
 - Python 3.12+ and Node.js 24+
-- Git, Poetry and Npm
+- Git, Poetry, Docker and Npm
 
 ### Installation
+
+#### Gateway
 
 1. Clone the repository:
 
@@ -30,6 +32,14 @@ To get a local copy of the project up and running on your machine, follow these 
 
    ```bash
    npm install --global smee-client
+   ```
+
+#### Worker
+
+1. After cloning the repository, run the following command to build the docker image
+
+   ```bash
+   docker buildx build -f Dockerfile.worker -t <imagename>:<tagname> .
    ```
 
 ### Configure the Project
@@ -60,6 +70,9 @@ To get a local copy of the project up and running on your machine, follow these 
 5. Write down the Webhook secret to the `APP_SECRET`
 6. Copy the `APP_ID` from the same page and fill it in `.env`
 7. Setup Redis Database and Set the connection URI to `REDIS_URL`
+8. For `docker-compose.yml`, check [docker-compose.yml.example](./docker-compose.yml.example)
+
+> For More information Check [Environment Variables](./README.md#environment-variables)
 
 ### Run the Project
 
@@ -75,7 +88,13 @@ To get a local copy of the project up and running on your machine, follow these 
    poetry run python main.py
    ```
 
-3. Now Install the Github App to your account and then start using it
+3. Start the Worker
+
+   ```bash
+   docker compose up
+   ```
+
+4. Now Install the Github App to your account and then start using it
 
 > Note: To avoid permission issues during development, feel free to grant your development app broad Read & Write access to 'Pull Requests', 'Issues', and 'Content', then narrow them down once your feature is complete.
 

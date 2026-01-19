@@ -1,0 +1,12 @@
+services:
+  worker:
+    container_name: worker_ksentry
+    image: <imagename>:<tagname>
+    ports:
+      - "8000:5001"
+    environment:
+      APP_PRIVATE_KEY: "Your Private Key Here"
+      APP_SECRET: "Your App Secret Here"
+      APP_ID: Your App ID Here
+      REDIS_URL: "Your Redis URI here"
+      PRODUCTION: true

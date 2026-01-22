@@ -1,6 +1,7 @@
 from core import settings
 from models import ScanData, PullRequesPayload
-from utils import jwt, scan, comment, messages
+from utils import jwt, scan, comment
+from models import GitLeaks
 import tempfile
 import os
 
@@ -36,6 +37,17 @@ async def check_pr():
 
   _, item = result
   return ScanData.fromBase64(item)
+
+
+def to_comments(data: list[GitLeaks]) -> list[comment.CommentData]:
+  result = []
+  for leaks in data:
+    result.append(
+      comment.CommentData(
+        path=leaks.File, line=leaks.StartLine, body="Probably a Secret"
+      )
+    )
+  return result
 
 
 async def scan_code():
@@ -77,10 +89,27 @@ async def scan_code():
 
     # If no secret found leave
     if len(result) == 0:
-      return
+      continue
 
-    await comment.post_comment(
-      token, pr_data.repo, pr_data.pr_number, messages.get_secret_found(result)
+    # Get the commit hash
+    pr_details_resp = await settings.HTTPX.get(
+      f"https://api.github.com/repos/{pr_data.repo}/pulls/{pr_data.pr_number}",
+      headers={
+        "Authorization": f"Bearer {token}",
+        "Accept": "application/vnd.github+json",  # Force JSON, not Diff
+      },
+    )
+    if pr_details_resp.status_code != 200:
+      continue
+
+    commit_hash = pr_details_resp.json()["head"]["sha"]
+    await comment.comment_on(
+      token=token,
+      repo=pr_data.repo,
+      pull_number=pr_data.pr_number,
+      commit_id=commit_hash,
+      main_message="Secrets found",
+      comments=to_comments(result),
     )
 
 

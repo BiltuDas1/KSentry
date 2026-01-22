@@ -29,7 +29,8 @@ def Webhook(app: FastAPI):
           if await is_updated.check_if_updated(payload):
             await scanning.request_scan(payload)
         case "synchronize":
-          await is_updated.updated_again(payload)
+          if await is_updated.updated_again(payload):
+            await scanning.request_scan(payload)
         case "closed":
           await closed_pull.pull_request_closed(payload)
     return True

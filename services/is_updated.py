@@ -47,19 +47,21 @@ async def updated_again(payload: PullRequesPayload):
 
   exist = await settings.REDIS.sismember("conflicted_pull_request", pull_number)  # type: ignore
   if not exist:
-    return
+    return True
 
   token: str = await jwt.get_installation_token(installation_id)
   if (
     response := await branch.compare_branch(token, repo, default_branch, label)
   ) is None:
-    return
+    return False
 
   data = CompareBranch.model_validate(response.json())
   if data.behind_by > 0:
     await comment.post_comment(
       token, repo, pull_number, messages.get_outdated_upstream_again(default_branch)
     )
+    return False
   else:
     await settings.REDIS.srem("conflicted_pull_request", pull_number)  # type: ignore
     await pr_label.remove_label_from_pr(token, repo, pull_number, "outdated")
+    return True

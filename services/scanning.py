@@ -103,7 +103,7 @@ async def scan_code():
       continue
 
     commit_hash = pr_details_resp.json()["head"]["sha"]
-    await comment.comment_on(
+    review = await comment.comment_on(
       token=token,
       repo=pr_data.repo,
       pull_number=pr_data.pr_number,
@@ -111,6 +111,10 @@ async def scan_code():
       main_message="Secrets found",
       comments=to_comments(result),
     )
+    if review.status_code != 200:
+      print("Failed", flush=True)
+    else:
+      print("Success", flush=True)
 
 
 async def request_scan(payload: PullRequesPayload):

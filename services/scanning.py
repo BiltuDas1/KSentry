@@ -1,6 +1,6 @@
 from core import settings
 from models import ScanData, PullRequesPayload
-from utils import jwt, scan, comment
+from utils import jwt, scan, comment, run_scan
 from models import GitLeaks
 import tempfile
 import os
@@ -56,6 +56,20 @@ async def scan_code():
   while (pr_data := await check_pr()) is not None:
     token: str = await jwt.get_installation_token(pr_data.installation_id)
 
+    # Get the commit hash
+    pr_details_resp = await settings.HTTPX.get(
+      f"https://api.github.com/repos/{pr_data.repo}/pulls/{pr_data.pr_number}",
+      headers={
+        "Authorization": f"Bearer {token}",
+        "Accept": "application/vnd.github+json",  # Force JSON, not Diff
+      },
+    )
+    if pr_details_resp.status_code != 200:
+      continue
+
+    commit_hash = pr_details_resp.json()["head"]["sha"]
+    await run_scan.in_progress(token, pr_data.repo, commit_hash)
+
     headers = {
       "Authorization": f"Bearer {token}",
       "Accept": "application/vnd.github.v3.diff",
@@ -65,6 +79,7 @@ async def scan_code():
       headers=headers,
     )
     if resp.status_code != 200:
+      await run_scan.failure(token, pr_data.repo, commit_hash)
       continue
 
     config_path = "gitleaks.toml"
@@ -88,20 +103,9 @@ async def scan_code():
 
     # If no secret found leave
     if len(result) == 0:
+      await run_scan.success(token, pr_data.repo, commit_hash)
       continue
 
-    # Get the commit hash
-    pr_details_resp = await settings.HTTPX.get(
-      f"https://api.github.com/repos/{pr_data.repo}/pulls/{pr_data.pr_number}",
-      headers={
-        "Authorization": f"Bearer {token}",
-        "Accept": "application/vnd.github+json",  # Force JSON, not Diff
-      },
-    )
-    if pr_details_resp.status_code != 200:
-      continue
-
-    commit_hash = pr_details_resp.json()["head"]["sha"]
     review = await comment.comment_on(
       token=token,
       repo=pr_data.repo,
@@ -114,6 +118,7 @@ async def scan_code():
       print("Failed", flush=True)
     else:
       print("Success", flush=True)
+    await run_scan.error(token, pr_data.repo, commit_hash)
 
 
 async def request_scan(payload: PullRequesPayload):

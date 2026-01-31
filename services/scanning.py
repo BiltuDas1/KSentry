@@ -40,12 +40,11 @@ async def check_pr():
 
 
 def to_comments(data: list[GitLeaks]) -> list[comment.CommentData]:
+  comment_body = "Probably a Secret\n> If it is false positive then add `gitleaks:allow` inline comment to this line, and then force push again"
   result = []
   for leaks in data:
     result.append(
-      comment.CommentData(
-        path=leaks.File, line=leaks.StartLine, body="Probably a Secret"
-      )
+      comment.CommentData(path=leaks.File, line=leaks.StartLine, body=comment_body)
     )
   return result
 

@@ -1,4 +1,4 @@
-from . import pull_request as prequest, compare_branch
+from . import pull_request as prequest, compare_branch, member as mem
 from pydantic import BaseModel, TypeAdapter
 from typing import List
 import base64
@@ -44,3 +44,9 @@ class GitLeaks(BaseModel):
   Match: str
   Secret: str
   Entropy: float
+
+
+class MemberPayload(BaseModel):
+  action: str
+  member: mem.Member
+  repository: mem.Repository

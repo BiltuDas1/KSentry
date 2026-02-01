@@ -1,8 +1,13 @@
 from core import settings
 
 
-async def add_collaborators(username: str, repo: str):
-  await settings.REDIS.hset(f"{repo}:colabs", username, 0)
+async def add_collaborators(
+  repo: str, username: str | None = None, mapping: dict[str, int] | None = None
+):
+  if username:
+    await settings.REDIS.hset(f"{repo}:colabs", username, 0)
+  if mapping:
+    await settings.REDIS.hset(f"{repo}:colabs", mapping=mapping)
 
 
 async def remove_collaborators(username: str, repo: str):

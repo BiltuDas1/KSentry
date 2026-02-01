@@ -1,7 +1,7 @@
 from fastapi import FastAPI
-from services import is_updated, closed_pull, scanning, reviewers
+from services import is_updated, closed_pull, scanning, reviewers, installation
 from fastapi.requests import Request
-from models import PullRequesPayload, MemberPayload
+from models import PullRequesPayload, MemberPayload, InstallationPayload
 from utils import verify_signature, collaborators
 import json
 from core import settings
@@ -11,6 +11,7 @@ def Webhook(app: FastAPI):
   @app.post("/")
   async def hook(request: Request):
     data = await request.body()
+    json_data = json.loads(data)
     sigHeader = str(request.headers.get("x-hub-signature-256"))
 
     if not verify_signature.verify_signature(data, sigHeader, settings.APP_SECRET):
@@ -19,7 +20,6 @@ def Webhook(app: FastAPI):
     event = str(request.headers.get("x-github-event"))
 
     if event == "pull_request":
-      json_data = json.loads(data)
       payload = PullRequesPayload.model_validate(json_data)
 
       match payload.action:
@@ -40,7 +40,7 @@ def Webhook(app: FastAPI):
             pr_number=payload.number,
           )
     elif event == "member":
-      payload = MemberPayload.model_validate(json.loads(data))
+      payload = MemberPayload.model_validate(json_data)
 
       match payload.action:
         case "added":
@@ -51,5 +51,8 @@ def Webhook(app: FastAPI):
           await collaborators.remove_collaborators(
             username=payload.member.login, repo=payload.repository.full_name
           )
+    elif event == "installation_repositories":
+      payload = InstallationPayload.model_validate(json_data)
+      await installation.store_collaborators(payload)
 
     return True

@@ -1,4 +1,4 @@
-from . import pull_request as prequest, compare_branch, member as mem
+from . import pull_request as prequest, compare_branch, member as mem, installation
 from pydantic import BaseModel, TypeAdapter
 from typing import List
 import base64
@@ -50,3 +50,9 @@ class MemberPayload(BaseModel):
   action: str
   member: mem.Member
   repository: mem.Repository
+
+
+class InstallationPayload(BaseModel):
+  action: str
+  repositories_added: list[installation.RepositoryAdded]
+  installation: installation.InstallationPayload

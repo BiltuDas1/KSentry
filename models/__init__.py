@@ -56,3 +56,9 @@ class InstallationPayload(BaseModel):
   action: str
   repositories_added: list[installation.RepositoryAdded]
   installation: installation.InstallationPayload
+
+
+class InstallationDefaultPayload(BaseModel):
+  action: str
+  repositories: list[installation.RepositoryAdded]
+  installation: installation.InstallationPayload

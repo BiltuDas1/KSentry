@@ -1,12 +1,14 @@
-from models import InstallationPayload
+from models.installation import RepositoryAdded
 from core import settings
 from utils import jwt, collaborators
 
 
-async def store_collaborators(payload: InstallationPayload):
-  token: str = await jwt.get_installation_token(payload.installation.id)
+async def store_collaborators(
+  list_of_repos: list[RepositoryAdded], installation_id: int
+):
+  token: str = await jwt.get_installation_token(installation_id)
 
-  for repo in payload.repositories_added:
+  for repo in list_of_repos:
     url = f"https://api.github.com/repos/{repo.full_name}/collaborators"
     headers = {
       "Authorization": f"Bearer {token}",

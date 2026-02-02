@@ -1,7 +1,12 @@
 from fastapi import FastAPI
 from services import is_updated, closed_pull, scanning, reviewers, installation
 from fastapi.requests import Request
-from models import PullRequesPayload, MemberPayload, InstallationPayload
+from models import (
+  PullRequesPayload,
+  MemberPayload,
+  InstallationPayload,
+  InstallationDefaultPayload,
+)
 from utils import verify_signature, collaborators
 import json
 from core import settings
@@ -51,8 +56,18 @@ def Webhook(app: FastAPI):
           await collaborators.remove_collaborators(
             username=payload.member.login, repo=payload.repository.full_name
           )
+    elif event == "installation":
+      payload = InstallationDefaultPayload.model_validate(json_data)
+      if payload.action == "created":
+        await installation.store_collaborators(
+          list_of_repos=payload.repositories, installation_id=payload.installation.id
+        )
     elif event == "installation_repositories":
       payload = InstallationPayload.model_validate(json_data)
-      await installation.store_collaborators(payload)
+      if payload.action == "added":
+        await installation.store_collaborators(
+          list_of_repos=payload.repositories_added,
+          installation_id=payload.installation.id,
+        )
 
     return True

@@ -46,3 +46,30 @@ def get_secret_found(secrets_data: list[GitLeaks]):
     )
 
   return messages.SECRET_FOUND.format(secrets_data="\n".join(data))
+
+
+def get_opensource_scoreboard(
+  username: str,
+  difficulty_level: str,
+  points_awarded: int,
+  total_score: int,
+  max_nums_of_issues_allowed: int,
+  project_link: str,
+):
+  """
+  Get the message body the open source competition scoreboard
+  """
+  awarded = ""
+  if points_awarded > 0:
+    awarded = f"+{points_awarded}"
+  else:
+    awarded = str(points_awarded)
+
+  return messages.SCOREBOARD.format(
+    username=username,
+    difficulty_level=difficulty_level,
+    points=awarded,
+    total_score=total_score,
+    num_of_issues=max_nums_of_issues_allowed,
+    project_link=project_link,
+  )

@@ -19,13 +19,16 @@ class RequestedReviewers(BaseModel):
   login: str
 
 
+class Owner(BaseModel):
+  login: str
+
+
 class PullRequest(BaseModel):
   head: PullRequestHead
   requested_reviewers: list[RequestedReviewers]
-
-
-class Owner(BaseModel):
-  login: str
+  merged: bool
+  labels: list[str]
+  user: Owner
 
 
 class Repository(BaseModel):

@@ -50,6 +50,14 @@ ALLOWED_USERS = set(
   str(environ.ENV.get("ALLOWED_USERS")).lower().strip().replace(",", " ").split()
 )
 
+# JWOC Repos
+if environ.ENV.exist("JWOC_REPOS"):
+  JWOC_REPOS: set[str] = set(
+    str(environ.ENV.get("JWOC_REPOS")).lower().strip().replace(",", " ").split()
+  )
+else:
+  JWOC_REPOS: set[str] = set()
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

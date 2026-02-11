@@ -1,3 +1,6 @@
+import datetime
+
+
 PULL_OUTDATED_UPSTREAM = """
 ### Your branch is outdated with `origin/{upstream_branch_name}` branch
 
@@ -55,4 +58,21 @@ SECRET_CODEBLOCK = """
 ```
 {line_num} | {redact_code}
 ```
+"""
+
+SCOREBOARD = """
+## 🎉 PR Successfully Merged!
+
+Congratulations @{username}! Your contribution has been merged into the main branch. 
+
+### 🏆 Scorecard Update
+| Category | Details |
+| :--- | :--- |
+| **Issue Level** | {difficulty_level} |
+| **Points Awarded** | `{points}` |
+| **New Total Score** | **{total_score} pts** |
+
+> [!TIP]
+> **What's Next?**
+> You can now pick up another issue! Remember, a single mentee can be allotted a maximum of {num_of_issues} issues at a time. Check the [Issue Board]({project_link}/issues) for more.
 """

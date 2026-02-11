@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from services import is_updated, closed_pull, scanning, reviewers, installation
+from services import is_updated, closed_pull, scanning, reviewers, installation, jwoc
 from fastapi.requests import Request
 from models import (
   PullRequesPayload,
@@ -39,6 +39,7 @@ def Webhook(app: FastAPI):
             await scanning.request_scan(payload)
         case "closed":
           await closed_pull.pull_request_closed(payload)
+          await jwoc.store_score(payload)
         case "review_requested":
           # On Review: Remove the pr number from the collaborator database
           await collaborators.remove_pr(

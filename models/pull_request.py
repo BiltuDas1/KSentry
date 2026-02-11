@@ -23,11 +23,15 @@ class Owner(BaseModel):
   login: str
 
 
+class Labels(BaseModel):
+  name: str
+
+
 class PullRequest(BaseModel):
   head: PullRequestHead
   requested_reviewers: list[RequestedReviewers]
   merged: bool
-  labels: list[str]
+  labels: list[Labels]
   user: Owner
 
 

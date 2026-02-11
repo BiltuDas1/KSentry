@@ -8,7 +8,7 @@ def get_score(payload: PullRequesPayload):
     return ("", 0)
 
   for label in payload.pull_request.labels:
-    if label.lower() in score:
-      return (label, score[label])
+    if label.name.lower() in score:
+      return (label.name, score[label.name])
 
   return ("", 0)

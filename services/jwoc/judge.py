@@ -15,7 +15,7 @@ async def store_score(payload: PullRequesPayload):
   username = payload.pull_request.user.login
 
   total_score = await settings.REDIS.hincrby(
-    f"{payload.repository.full_name}:leaderboard", username, score_earned
+    f"{payload.repository.full_name}:leaderboard", username, score_earned[1]
   )
 
   token: str = await jwt.get_installation_token(payload.installation.id)

@@ -43,6 +43,13 @@ REDIS = redis.from_url(
   str(environ.ENV.get("REDIS_URL")), encoding="utf-8", decode_responses=True
 )
 
+# Allowed Users
+if not environ.ENV.exist("ALLOWED_USERS"):
+  raise EnvironmentError("ALLOWED_USERS Environment can't be empty")
+ALLOWED_USERS = set(
+  str(environ.ENV.get("ALLOWED_USERS")).lower().strip().replace(",", " ").split()
+)
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

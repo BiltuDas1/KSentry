@@ -26,6 +26,8 @@ def Webhook(app: FastAPI):
 
     if event == "pull_request":
       payload = PullRequesPayload.model_validate(json_data)
+      if payload.repository.owner.login.lower() not in settings.ALLOWED_USERS:
+        return False
 
       match payload.action:
         case "opened":
@@ -46,6 +48,8 @@ def Webhook(app: FastAPI):
           )
     elif event == "member":
       payload = MemberPayload.model_validate(json_data)
+      if payload.repository.owner.login.lower() not in settings.ALLOWED_USERS:
+        return False
 
       match payload.action:
         case "added":

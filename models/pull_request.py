@@ -24,6 +24,11 @@ class PullRequest(BaseModel):
   requested_reviewers: list[RequestedReviewers]
 
 
+class Owner(BaseModel):
+  login: str
+
+
 class Repository(BaseModel):
   full_name: str
   default_branch: str
+  owner: Owner

@@ -37,3 +37,4 @@ KSentry is a lightweight, serverless security and workflow orchestrator that ser
 | `REDIS_URL`       | URI of the Redis Database                                                               | Gateway, Worker |
 | `SERVERLESS`      | If true, it means it's the Gateway, otherwise it's worker                               | Gateway, Worker |
 | `WORKER_URL`      | Webhook URL of the worker                                                               | Gateway         |
+| `ALLOWED_USERS`   | Github usernames who have permission to use this bot (seperated by commas)              | Gateway         |

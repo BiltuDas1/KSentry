@@ -14,12 +14,12 @@ OPENAPI_URL = "/openapi.json" if not PRODUCTION else None
 # Load APP_PRIVATE_KEY
 if not environ.ENV.exist("APP_PRIVATE_KEY"):
   raise EnvironmentError("APP_PRIVATE_KEY Environment can't be empty")
-APP_PRIVATE_KEY = str(environ.ENV.get("APP_PRIVATE_KEY"))
+APP_PRIVATE_KEY = str(environ.ENV.get("APP_PRIVATE_KEY")).strip().replace("\\n", "\n")
 
 # Load APP_ID
 if not environ.ENV.exist("APP_ID"):
   raise EnvironmentError("APP_ID Environment can't be empty")
-APP_ID = str(environ.ENV.get("APP_ID"))
+APP_ID = int(str(environ.ENV.get("APP_ID")))
 
 # Load APP_SECRET
 if not environ.ENV.exist("APP_SECRET"):

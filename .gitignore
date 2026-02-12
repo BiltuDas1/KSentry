@@ -211,3 +211,6 @@ __marimo__/
 
 # Docker
 docker-compose.yml
+
+# Vs Code
+.vscode

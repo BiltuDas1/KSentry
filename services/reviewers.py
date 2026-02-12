@@ -16,7 +16,7 @@ def choose_user(users: list[str], statistics: dict[str, int]):
     start += 1
     end -= 1
 
-  end = 0
+  end = len(users)
   for i in range(1, len(users)):
     if statistics[users[i - 1]] < statistics[users[i]]:
       end = i
@@ -40,6 +40,8 @@ async def add_reviewers(payload: PullRequesPayload):
   # If all have same load then pick random
   # Otherwise pick the one user which have low load
   # If multiple users have low load then pick randomly among them
+  print(users, flush=True)
+  print(statistics, flush=True)
   user = choose_user(users, statistics)
   if user is None:
     return False

@@ -16,11 +16,14 @@ def choose_user(users: list[str], statistics: dict[str, int]):
     start += 1
     end -= 1
 
-  end = len(users)
+  end = -1
   for i in range(1, len(users)):
     if statistics[users[i - 1]] < statistics[users[i]]:
       end = i
       break
+
+  if end == -1:
+    return None
 
   picked = random.randrange(end)
   return users[picked]

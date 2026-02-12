@@ -4,29 +4,17 @@ import random
 
 
 def choose_user(users: list[str], statistics: dict[str, int]):
-  if len(users) == 0:
-    return None
-  if len(users) == 1:
-    return users[0]
-
-  start, end = 0, len(users) - 1
-  while start < end:
-    if statistics[users[start]] > statistics[users[end]]:
-      users[start], users[end] = users[end], users[start]
-    start += 1
-    end -= 1
-
-  end = -1
-  for i in range(1, len(users)):
-    if statistics[users[i - 1]] < statistics[users[i]]:
-      end = i
-      break
-
-  if end == -1:
+  """
+  Selects a user with the lowest workload.
+  If multiple users have the same minimum workload, it picks one randomly.
+  """
+  if not users:
     return None
 
-  picked = random.randrange(end)
-  return users[picked]
+  min_workload = min(statistics[u] for u in users)
+  candidates = [u for u in users if statistics[u] == min_workload]
+
+  return random.choice(candidates)
 
 
 async def add_reviewers(payload: PullRequesPayload):

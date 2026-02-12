@@ -44,11 +44,12 @@ REDIS = redis.from_url(
 )
 
 # Allowed Users
-if not environ.ENV.exist("ALLOWED_USERS"):
-  raise EnvironmentError("ALLOWED_USERS Environment can't be empty")
-ALLOWED_USERS = set(
-  str(environ.ENV.get("ALLOWED_USERS")).lower().strip().replace(",", " ").split()
-)
+if environ.ENV.exist("ALLOWED_USERS"):
+  ALLOWED_USERS: set[str] = set(
+    str(environ.ENV.get("ALLOWED_USERS")).lower().strip().replace(",", " ").split()
+  )
+else:
+  ALLOWED_USERS: set[str] = set()
 
 # JWOC Repos
 if environ.ENV.exist("JWOC_REPOS"):

@@ -46,11 +46,4 @@ async def add_reviewers(payload: PullRequesPayload):
     pr_number=payload.number,
   )
 
-  if not success:
-    return False
-
-  await collaborators.attach_pr(
-    username=user, repo=payload.repository.full_name, pr_number=payload.number
-  )
-
-  return True
+  return success

@@ -41,6 +41,13 @@ def Webhook(app: FastAPI):
           await closed_pull.pull_request_closed(payload)
           await jwoc.store_score(payload)
         case "review_requested":
+          # On Review: Attach the pr number in the collaborator database
+          await collaborators.attach_pr(
+            username=json_data["requested_reviewer"]["login"],
+            repo=payload.repository.full_name,
+            pr_number=payload.number,
+          )
+        case "review_request_removed":
           # On Review: Remove the pr number from the collaborator database
           await collaborators.remove_pr(
             username=json_data["requested_reviewer"]["login"],

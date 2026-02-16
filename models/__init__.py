@@ -1,4 +1,10 @@
-from . import pull_request as prequest, compare_branch, member as mem, installation
+from . import (
+  pull_request as prequest,
+  compare_branch,
+  member as mem,
+  installation,
+  issues,
+)
 from pydantic import BaseModel, TypeAdapter
 from typing import List
 import base64
@@ -62,3 +68,10 @@ class InstallationDefaultPayload(BaseModel):
   action: str
   repositories: list[installation.RepositoryAdded]
   installation: installation.InstallationPayload
+
+
+class IssuesPayload(BaseModel):
+  action: str
+  assignee: issues.IssueAssignee
+  repository: mem.Repository
+  issue: issues.Issue

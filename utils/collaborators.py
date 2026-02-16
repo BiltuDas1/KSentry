@@ -43,3 +43,11 @@ async def attach_user_to_pr(token: str, username: str, repo: str, pr_number: int
     return True
   else:
     return False
+
+
+async def attach_user_issue(username: str, repo: str, issue_number: int):
+  await settings.REDIS.sadd(f"{repo}:issues:{username}", issue_number)
+
+
+async def remove_user_issue(username: str, repo: str, issue_number: int):
+  await settings.REDIS.srem(f"{repo}:issues:{username}", issue_number)

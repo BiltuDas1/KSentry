@@ -6,6 +6,7 @@ from models import (
   MemberPayload,
   InstallationPayload,
   InstallationDefaultPayload,
+  IssuesPayload,
 )
 from utils import verify_signature, collaborators
 import json
@@ -54,6 +55,25 @@ def Webhook(app: FastAPI):
             repo=payload.repository.full_name,
             pr_number=payload.number,
           )
+    elif event == "issues":
+      payload = IssuesPayload.model_validate(json_data)
+      if payload.repository.owner.login.lower() not in settings.ALLOWED_USERS:
+        return False
+
+      match payload.action:
+        case "assigned":
+          await collaborators.attach_user_issue(
+            username=payload.assignee.login,
+            repo=payload.repository.full_name,
+            issue_number=payload.issue.number,
+          )
+        case "unassigned":
+          await collaborators.remove_user_issue(
+            username=payload.assignee.login,
+            repo=payload.repository.full_name,
+            issue_number=payload.issue.number,
+          )
+
     elif event == "member":
       payload = MemberPayload.model_validate(json_data)
       if payload.repository.owner.login.lower() not in settings.ALLOWED_USERS:

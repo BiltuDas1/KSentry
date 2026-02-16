@@ -7,6 +7,7 @@ async def pull_request_closed(payload: PullRequesPayload):
   """
   Remove the pull number from the outdated list
   """
+  updated_prs: set[str] = set()
   pull_number = payload.number
   await settings.REDIS.srem("conflicted_pull_request", pull_number)  # type: ignore
 
@@ -17,6 +18,7 @@ async def pull_request_closed(payload: PullRequesPayload):
       repo=payload.repository.full_name,
       pr_number=payload.number,
     )
+    updated_prs.add(reviewers.login)
 
   # Get the actual reviewers and remove them from the pr
   token: str = await jwt.get_installation_token(payload.installation.id)
@@ -33,8 +35,12 @@ async def pull_request_closed(payload: PullRequesPayload):
     if reviewers["user"]["type"].lower() != "user":
       continue
 
+    user = reviewers["user"]["login"]
+    if user in updated_prs:
+      continue
+
     await collaborators.remove_pr(
-      username=reviewers["user"]["login"],
+      username=user,
       repo=payload.repository.full_name,
       pr_number=payload.number,
     )

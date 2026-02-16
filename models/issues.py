@@ -7,3 +7,8 @@ class IssueAssignee(BaseModel):
 
 class Issue(BaseModel):
   number: int
+  assignee: IssueAssignee
+
+
+class IssueInstallation(BaseModel):
+  id: int

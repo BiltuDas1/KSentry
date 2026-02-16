@@ -73,3 +73,10 @@ def get_opensource_scoreboard(
     num_of_issues=max_nums_of_issues_allowed,
     project_link=project_link,
   )
+
+
+def get_issue_max_comment(username: str, threadsold: int):
+  """
+  Get the comment message when the user have more than certain amount of issue assigned
+  """
+  return messages.ISSUE_MAX_ASSIGNED.format(username=username, threadsold=threadsold)

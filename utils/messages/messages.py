@@ -76,3 +76,7 @@ Congratulations @{username}! Your contribution has been merged into the main bra
 > **What's Next?**
 > You can now pick up another issue! Remember, a single mentee can be allotted a maximum of {num_of_issues} issues at a time. Check the [Issue Board]({project_link}/issues) for more.
 """
+
+ISSUE_MAX_ASSIGNED = """
+@{username} It looks like you've reached the limit of {threadsold} active issues. Finish up your current work first so we can get it merged, then you can jump right back in here!
+"""

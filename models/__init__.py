@@ -72,6 +72,6 @@ class InstallationDefaultPayload(BaseModel):
 
 class IssuesPayload(BaseModel):
   action: str
-  assignee: issues.IssueAssignee
   repository: mem.Repository
   issue: issues.Issue
+  installation: issues.IssueInstallation

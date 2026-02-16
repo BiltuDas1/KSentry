@@ -63,13 +63,19 @@ def Webhook(app: FastAPI):
       match payload.action:
         case "assigned":
           await collaborators.attach_user_issue(
-            username=payload.assignee.login,
+            username=payload.issue.assignee.login,
             repo=payload.repository.full_name,
             issue_number=payload.issue.number,
           )
         case "unassigned":
           await collaborators.remove_user_issue(
-            username=payload.assignee.login,
+            username=payload.issue.assignee.login,
+            repo=payload.repository.full_name,
+            issue_number=payload.issue.number,
+          )
+        case "closed":
+          await collaborators.remove_user_issue(
+            username=payload.issue.assignee.login,
             repo=payload.repository.full_name,
             issue_number=payload.issue.number,
           )
